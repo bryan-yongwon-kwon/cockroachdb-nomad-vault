@@ -1,29 +1,50 @@
 ---
 layout: post
-title:  "Welcome to Jekyll!"
+title:  "How to use HashiCorp Vault and Nomad with CockroachDB"
 date:   2021-08-16 19:28:37 -0500
-categories: jekyll update
+categories: cockroachdb nomad vault
 ---
-You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
+## Overview
+Demonstrate [CockroachDB](https://www.cockroachlabs.com/docs/) secure, 3 node deployment using Nomad and Vault. This demo extends [rinokadijk's blog post](rino-blog) for CockroachDB-Vault deployment using Docker Compose. We will be covering two stages of HashiCorp's application stack: 
 
-Jekyll requires blog post files to be named according to the following format:
+![hashicorp_stack](media/hashicorp_stack.png)
 
-`YEAR-MONTH-DAY-title.MARKUP`
+## Components
+- CockroachDB `v21.1.7` 
+    - distributed SQL with serializable transaction guarantee
+- Nomad `1.1.3` 
+    - orchestration
+- Vault `1.8.1` 
+    - secret management
 
-Where `YEAR` is a four-digit number, `MONTH` and `DAY` are both two-digit numbers, and `MARKUP` is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.
+## Initial Setup Using Docker Compose
+Let's [Rinokadijk's example](rino-git) to work with CockroachDB v21.1.x and add HAProxy. So we now have:
 
-Jekyll also offers powerful support for code snippets:
+* `vault`   - HashiCorp Vault
+* `vault-init-client` - creates CA, node, client certificates
+* `roach-0` - CockroachDB node
+* `roach-1` - CockroachDB node
+* `roach-2` - CockroachDB node
+* `lb` - HAProxy acting as load balancer
+* `roach-init` - Executes some commands against CockroachDB and shuts down. See [here](https://github.com/timveil-cockroach/cockroachdb-remote-client).
 
-{% highlight ruby %}
-def print_hi(name)
-  puts "Hi, #{name}"
-end
-print_hi('Tom')
-#=> prints 'Hi, Tom' to STDOUT.
-{% endhighlight %}
+## Testing CockroachDB and Vault Using Docker Compose
+>If you are using Google Chrome as your browser, you may want to navigate here `chrome://flags/#allow-insecure-localhost` and set this flag to `Enabled`. 
 
-Check out the [Jekyll docs][jekyll-docs] for more info on how to get the most out of Jekyll. File all bugs/feature requests at [Jekyll’s GitHub repo][jekyll-gh]. If you have questions, you can ask them on [Jekyll Talk][jekyll-talk].
+1. execute `./up.sh` to start the cluster
+2. visit the CockroachDB UI @ https://localhost:8080 and login with username `test` and password `password`
+3. visit the HAProxy UI @ http://localhost:8081
+4. execute `./down.sh` to stop the cluster
 
-[jekyll-docs]: https://jekyllrb.com/docs/home
-[jekyll-gh]:   https://github.com/jekyll/jekyll
-[jekyll-talk]: https://talk.jekyllrb.com/
+```bash
+docker compose exec roach-0 /bin/bash
+docker compose exec roach-1 /bin/bash
+docker compose exec roach-2 /bin/bash
+docker compose exec lb /bin/sh
+docker compose exec roach-cert /bin/sh
+```
+
+
+
+[rino-blog]: https://rinokadijk.github.io/vault-cockroach/
+[rino-git]: https://github.com/rinokadijk/vault-cockroach
