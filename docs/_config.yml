@@ -1,0 +1,14 @@
+title: How to convert Docker Compose for CockroachDB and Vault to HashiCorp Nomad
+email: bryan.yongwon.kwon@gmail.com
+description: >- # this means to ignore newlines until "baseurl:"
+  HashiCorp Nomad is an orchestration engine just like Docker Compose, Kubernetes, and Ansible (to name a few).
+  Let's take an existing Docker Compose file for secure CockroachDB and Vault and convert it to Nomad.
+baseurl: "/cockroachdb-nomad-vault/"
+url: "https://bryan-yongwon-kwon.github.io"
+twitter_username: strangr525
+github_username:  bryan-yongwon-kwon
+
+# Build settings
+theme: minima
+plugins:
+  - jekyll-feed

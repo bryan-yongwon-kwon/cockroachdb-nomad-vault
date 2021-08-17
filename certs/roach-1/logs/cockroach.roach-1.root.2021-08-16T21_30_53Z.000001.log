@@ -1,0 +1,11 @@
+I210816 21:30:53.638656 1 util/log/file_sync_buffer.go:238 ⋮ [config]   file created at: 2021/08/16 21:30:53
+I210816 21:30:53.638676 1 util/log/file_sync_buffer.go:238 ⋮ [config]   running on machine: ‹roach-1›
+I210816 21:30:53.638684 1 util/log/file_sync_buffer.go:238 ⋮ [config]   binary: CockroachDB CCL v21.1.0 (x86_64-unknown-linux-gnu, built 2021/05/17 13:49:40, go1.15.11)
+I210816 21:30:53.638690 1 util/log/file_sync_buffer.go:238 ⋮ [config]   arguments: ‹[/cockroach/cockroach start --cluster-name=example-dot-com --logtostderr=WARNING --log-file-verbosity=WARNING --certs-dir=/certs/roach-1 --listen-addr=roach-1.crdb.io:26257 --advertise-addr=roach-1.crdb.io:26257 --join=roach-0.crdb.io]›
+I210816 21:30:53.638704 1 util/log/file_sync_buffer.go:238 ⋮ [config]   line format: [IWEF]yymmdd hh:mm:ss.uuuuuu goid file:line msg utf8=✓
+W210816 21:30:53.636633 1 1@cli/start.go:958 ⋮ [-] 1  ‹Using the default setting for --cache (128 MiB).›
+W210816 21:30:53.636633 1 1@cli/start.go:958 ⋮ [-] 1 +‹  A significantly larger value is usually needed for good performance.›
+W210816 21:30:53.636633 1 1@cli/start.go:958 ⋮ [-] 1 +‹  If you have a dedicated server a reasonable setting is --cache=.25 (2.9 GiB).›
+E210816 21:30:53.674003 1 1@cli/error.go:399 ⋮ [-] 2  ‹ERROR: cannot load certificates.›
+E210816 21:30:53.674003 1 1@cli/error.go:399 ⋮ [-] 2 +‹Check your certificate settings, set --certs-dir, or use --insecure for insecure clusters.›
+E210816 21:30:53.674003 1 1@cli/error.go:399 ⋮ [-] 2 +‹failed to start server: problem using security settings: no certificates found; does certs dir exist?›
