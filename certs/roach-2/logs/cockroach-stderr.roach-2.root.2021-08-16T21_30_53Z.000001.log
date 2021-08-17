@@ -1,6 +1,0 @@
-I210816 21:30:53.654311 1 util/log/file_sync_buffer.go:238 ⋮ [config]   file created at: 2021/08/16 21:30:53
-I210816 21:30:53.654347 1 util/log/file_sync_buffer.go:238 ⋮ [config]   running on machine: ‹roach-2›
-I210816 21:30:53.654358 1 util/log/file_sync_buffer.go:238 ⋮ [config]   binary: CockroachDB CCL v21.1.0 (x86_64-unknown-linux-gnu, built 2021/05/17 13:49:40, go1.15.11)
-I210816 21:30:53.654371 1 util/log/file_sync_buffer.go:238 ⋮ [config]   arguments: ‹[/cockroach/cockroach start --cluster-name=example-dot-com --logtostderr=WARNING --log-file-verbosity=WARNING --certs-dir=/certs/roach-2 --listen-addr=roach-2.crdb.io:26257 --advertise-addr=roach-2.crdb.io:26257 --join=roach-0.crdb.io]›
-I210816 21:30:53.654476 1 util/log/file_sync_buffer.go:238 ⋮ [config]   line format: [IWEF]yymmdd hh:mm:ss.uuuuuu goid file:line msg utf8=✓
-I210816 21:30:53.650954 1 util/log/flags.go:193  [-] 1  stderr capture started
