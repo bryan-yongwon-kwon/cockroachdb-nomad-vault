@@ -1,0 +1,106 @@
+version: "3.8"
+services:
+  vault:
+    image: vault:latest
+    command: server
+    environment:
+      VAULT_LOCAL_CONFIG: '{"backend": {"file": {"path": "/vault/file"}}, "default_lease_ttl": "168h", "max_lease_ttl": "720h", "ui" : "true", "listener" : { "tcp" : { "address" : "0.0.0.0:8200", "tls_disable" : "true"  } } }'
+    cap_add:
+    - IPC_LOCK
+    ports:
+    - "8200:8200"
+    healthcheck:
+      test: ["CMD-SHELL", "test", "-f", "/vault/config/local.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+    - "./vault-data:/vault"
+    - "./vault-config:/vault/config"
+
+  vault-init-client:
+    command: ./vault-init/init-certificate-chain.sh
+    build:
+      context: ./vault-client/
+    cap_add:
+    - IPC_LOCK
+    depends_on:
+    - vault
+    environment:
+      VAULT_ADDR: 'http://vault:8200'
+      VAULT_FORMAT: 'table'
+    healthcheck:
+      test: ["CMD-SHELL", "test", "-f", "/cockroach-certs/roach0/node.key"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    volumes:
+    - "./vault-client:/vault-init"
+    - "./vault-token:/vault-token"
+    - "./cockroach-data:/cockroach-certs"
+  roach0:
+    container_name: roach0
+    hostname: roach0.crdb.io
+    image: cockroachdb/cockroach:latest
+    command: shell /scripts/start-roach1.sh
+    volumes:
+      - "./cockroach-data/roach0:/certs"
+      - "./cockroachdb:/scripts"
+    depends_on:
+      - vault-init-client  
+  roach1:
+    container_name: roach1
+    hostname: roach1.crdb.io
+    image: cockroachdb/cockroach:latest
+    command: shell /scripts/start-roach2.sh
+    volumes:
+      - "./cockroach-data/roach1:/certs"
+      - "./cockroachdb:/scripts"
+    depends_on:
+      - vault-init-client
+      - roach0
+
+  roach2:
+    container_name: roach2
+    hostname: roach2.crdb.io
+    image: cockroachdb/cockroach:latest
+    command: shell /scripts/start-roach3.sh
+    volumes:
+      - "./cockroach-data/roach2:/certs"
+      - "./cockroachdb:/scripts"
+    depends_on:
+      - vault-init-client
+      - roach1
+
+  lb:
+    container_name: lb
+    hostname: lb.crdb.io
+    image: timveil/dynamic-haproxy:latest
+    ports:
+      - "26257:26257"
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - NODES=roach0.crdb.io roach1.crdb.io roach2.crdb.io
+    depends_on:
+      - roach0
+      - roach1
+      - roach2
+
+  roach-init:
+    container_name: roach-init
+    hostname: roach-init
+    image: timveil/cockroachdb-remote-client:latest
+    environment:
+      - COCKROACH_HOST=roach0.crdb.io:26257
+      - COCKROACH_INSECURE=false
+      - COCKROACH_INIT=true
+      - COCKROACH_CERTS_DIR=/certs
+      - DATABASE_NAME=test
+      - DATABASE_USER=test
+      - DATABASE_PASSWORD=password
+    volumes:
+      - "./cockroach-data/roach-client:/certs"
+    depends_on:
+      - lb
+      - vault-init-client
